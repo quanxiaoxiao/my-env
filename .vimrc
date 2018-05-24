@@ -61,7 +61,6 @@ iabbrev pshr@@ PropTypes.shape({}).isRequired,
 call plug#begin('~/.vim/plugged')
 
 Plug 'https://github.com/scrooloose/nerdtree.git'
-Plug 'https://github.com/morhetz/gruvbox.git'
 Plug 'https://github.com/w0rp/ale.git'
 Plug 'https://github.com/kien/ctrlp.vim.git'
 Plug 'https://github.com/editorconfig/editorconfig-vim.git'
@@ -76,6 +75,7 @@ Plug 'https://github.com/benmills/vimux.git'
 Plug 'https://github.com/christoomey/vim-tmux-navigator.git'
 Plug 'https://github.com/ekalinin/Dockerfile.vim.git'
 Plug 'https://github.com/mileszs/ack.vim.git'
+Plug 'dracula/vim', { 'as': 'dracula' }
 
 call plug#end()
 
@@ -93,6 +93,9 @@ set shiftwidth=2
 " 让vim把连续数量的空格视为一个制表符
 set softtabstop=2
 filetype plugin indent on
+
+" theme
+color dracula
 
 " ident-guides
 let g:indent_guides_enable_on_vim_startup=0
@@ -114,11 +117,6 @@ let g:ackprg = 'ag --nogroup --nocolor --column'
 
 let g:jsx_ext_required=0
 
-" theme
-set background=dark
-colorscheme gruvbox
-" colorscheme molokai
-" colorscheme dracula
 
 " line
 
