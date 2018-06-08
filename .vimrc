@@ -75,7 +75,7 @@ Plug 'https://github.com/benmills/vimux.git'
 Plug 'https://github.com/christoomey/vim-tmux-navigator.git'
 Plug 'https://github.com/ekalinin/Dockerfile.vim.git'
 Plug 'https://github.com/mileszs/ack.vim.git'
-Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'https://github.com/morhetz/gruvbox.git'
 
 call plug#end()
 
@@ -95,7 +95,8 @@ set softtabstop=2
 filetype plugin indent on
 
 " theme
-color dracula
+set background=dark
+colorscheme gruvbox
 
 " ident-guides
 let g:indent_guides_enable_on_vim_startup=0

@@ -1,17 +1,26 @@
 FROM ubuntu:17.10
 
 ENV DEBIAN_FRONTEND noninteractive
-ENV LC_ALL C.UTF-8
+ENV TZ=Asia/Shanghai
 ENV HOME /root
-ENV NPM_CONFIG_LOGLEVEL warn
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
   apt-utils \
+  locales \
   ca-certificates \
   && apt-get purge --auto-remove \
   && rm -rf /tmp/* /var/lib/apt/lists/*
 
 COPY sources.list /etc/apt/sources.list
+
+RUN locale-gen zh_CN.UTF-8 && \
+  DEBIAN_FRONTEND=noninteractive dpkg-reconfigure locales
+RUN locale-gen zh_CN.UTF-8
+ENV LANG zh_CN.UTF-8
+ENV LANGUAGE zh_CN:zh
+ENV LC_ALL zh_CN.UTF-8
+
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
   bash \
@@ -36,27 +45,15 @@ RUN git clone https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh \
   && cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc \
   && chsh -s /bin/zsh
 
-RUN curl -sL https://deb.nodesource.com/setup_9.x | bash - \
-    && apt-get update && apt-get install -y --no-install-recommends nodejs \
-    && apt-get purge --auto-remove \
-    && rm -rf /tmp/* /var/lib/apt/lists/*
-
 COPY .vimrc /root/.vimrc
 
 RUN curl -fsLo ~/.vim/autoload/plug.vim --create-dirs \
-  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim \
-  && rm -rf /tem/*
+  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 WORKDIR /root
 
-RUN npm install -g cnpm # --registry=https://registry.npm.taobao.org
-
-RUN cnpm install -g eslint \
- eslint-config-airbnb \
- eslint-plugin-jsx-a11y \
- eslint-plugin-react \
- eslint-plugin-import \
- babel-eslint \
- eslint-import-resolver-webpack
+RUN git clone https://github.com/gpakosz/.tmux.git \
+  && ln -s -f .tmux/.tmux.conf \
+  && cp .tmux/.tmux.conf.local .
 
 CMD ["zsh"]
