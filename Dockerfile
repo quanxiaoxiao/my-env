@@ -1,6 +1,5 @@
 FROM ubuntu:17.10
 
-ENV DEBIAN_FRONTEND noninteractive
 ENV TZ=Asia/Shanghai
 ENV HOME /root
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
@@ -21,8 +20,7 @@ ENV LANG zh_CN.UTF-8
 ENV LANGUAGE zh_CN:zh
 ENV LC_ALL zh_CN.UTF-8
 
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
   bash \
   curl \
   git \
@@ -37,6 +35,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   zsh \
   silversearcher-ag \
   vim \
+  iputils-ping \
+  traceroute \
+  net-tools \
+  iproute2 \
   && apt-get purge --auto-remove \
   && rm -rf /tmp/* /var/lib/apt/lists/*
 
