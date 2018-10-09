@@ -9,50 +9,48 @@ set nowrap
 nnoremap <leader>U viwU
 nnoremap <leader>u viwu
 
+" abbrev require
+iabbrev _$@ const _ = require('lodash');
+iabbrev fp$@ const fp = require('lodash/fp');
+
 " abbrev
 iabbrev p@@ import PropTypes from 'prop-types';
 iabbrev fp@@ import fp from 'lodash/fp';
 iabbrev _@@ import _ from 'lodash';
-iabbrev moment@@ import moment from 'moment';
 iabbrev connect@@ import { connect } from 'react-redux';
 iabbrev cn@@ import cn from 'classnames';
-iabbrev toastr@@ import { toastr } from 'react-redux-toastr';
-iabbrev request@@ import request from 'quan-request';
-iabbrev payload@@ action.payload
-iabbrev props@@ const {} = this.props;
 
 iabbrev ps@@ PropTypes.string,
-iabbrev pb@@ PropTypes.bool,
-iabbrev po@@ PropTypes.object,
-iabbrev pn@@ PropTypes.number,
-iabbrev pa@@ PropTypes.array,
-iabbrev pf@@ PropTypes.func,
-iabbrev pe@@ PropTypes.element,
-
-iabbrev paof@@ PropTypes.arrayOf(),
-iabbrev pof@@ PropTypes.oneOf([]),
-iabbrev poft@@ PropTypes.oneOfType([]),
-iabbrev psh@@ PropTypes.shape({}),
-
 iabbrev psr@@ PropTypes.string.isRequired,
+iabbrev pb@@ PropTypes.bool,
 iabbrev pbr@@ PropTypes.bool.isRequired,
+iabbrev po@@ PropTypes.object,
 iabbrev por@@ PropTypes.object.isRequired,
+iabbrev pn@@ PropTypes.number,
 iabbrev pnr@@ PropTypes.number.isRequired,
+iabbrev pa@@ PropTypes.array,
 iabbrev par@@ PropTypes.array.isRequired,
+iabbrev pf@@ PropTypes.func,
 iabbrev pfr@@ PropTypes.func.isRequired,
+iabbrev pe@@ PropTypes.element,
 iabbrev per@@ PropTypes.element.isRequired,
 
-iabbrev paofr@@ PropTypes.arrayOf().isRequired,
+iabbrev pany@@ PropTypes.any,
+iabbrev panyr@@ PropTypes.any.isRequired,
+iabbrev pao@@ PropTypes.arrayOf(),
+iabbrev paor@@ PropTypes.arrayOf().isRequired,
+iabbrev pof@@ PropTypes.oneOf([]),
 iabbrev pofr@@ PropTypes.oneOf([]).isRequired,
+iabbrev poft@@ PropTypes.oneOfType([]),
 iabbrev poftr@@ PropTypes.oneOfType([]).isRequired,
+iabbrev psh@@ PropTypes.shape({}),
 iabbrev pshr@@ PropTypes.shape({}).isRequired,
+
+
 
 "autocommand
 :autocmd BufRead .babelrc :set filetype=json
 :autocmd BufRead .eslintrc :set filetype=json
-:autocmd BufRead .eslintignore :set filetype=json
-
-:autocmd FileType javascript :iabbrev <buffer> iff if ()<left>
 
 
 " -------------------------------------------------------------------->
@@ -76,6 +74,9 @@ Plug 'https://github.com/christoomey/vim-tmux-navigator.git'
 Plug 'https://github.com/ekalinin/Dockerfile.vim.git'
 Plug 'https://github.com/mileszs/ack.vim.git'
 Plug 'https://github.com/morhetz/gruvbox.git'
+Plug 'iamcco/mathjax-support-for-mkdp'
+Plug 'iamcco/markdown-preview.vim'
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 
 call plug#end()
 
@@ -134,8 +135,16 @@ endfunction
 function s:convertReduxActionType()
   let a:word = expand('<cword>')
   let a:upperDashword = s:upperDashword(a:word)
-  let a:path = matchlist(expand('%:t'), '\(.\+\)\.js$')[1]
-  exe "norm! viwcexport const " .a:upperDashword. " = '" .a:path. "/" .a:upperDashword. "';\<Esc>"
+  let a:dirPath = expand('%:h')
+  let a:name = matchlist(a:dirPath, '\/\([^/]\+\)$')[1]
+  if a:dirPath =~ "\/scenes\/"
+    let a:sceneName = matchlist(a:dirPath, '\/scenes\/\([^/]\+\)')[1]
+    let a:line = "export const " .a:upperDashword. " = '" .a:sceneName. "/" .a:name. "/" .a:upperDashword. "';"
+    exe "norm! cc" .a:line. "\<Esc>"
+  else
+    let a:line = "export const " .a:upperDashword. " = 'root/" .a:name. "/" .a:upperDashword. "';"
+    exe "norm! cc" .a:line. "\<Esc>"
+  endif
 endfunction
 
 function s:generateReactState()
@@ -161,7 +170,7 @@ function s:generateReduxDispatchAction()
   exe "norm! viwcexport const " .a:word. " = () =>\n(dispatch) => {\n};"
 endfunction
 
-nnoremap <leader>_ :<C-U>call <SID>convertReduxActionType()<CR> 
+nnoremap <leader>_ :<C-U>call <SID>convertReduxActionType()<CR>
 nnoremap <leader>a :<C-U>call <SID>generateReduxAction()<CR>
 nnoremap <leader>d :<C-U>call <SID>generateReduxDispatchAction()<CR>
 nnoremap <leader>s :<C-U>call <SID>generateReactState()<CR>
@@ -169,20 +178,26 @@ nnoremap <leader>p :<C-U>call <SID>generateReactProps()<CR>
 
 "import require
 
-function s:importModal()
+function s:importModalLine()
   let a:word = expand('<cword>')
   let a:moduleName = tolower(a:word)
   exe "norm! ccimport " .a:word. " from '" .a:moduleName. "';"
 endfunction
 
-function s:requireModal()
+function s:requireModalLine()
   let a:word = expand('<cword>')
   let a:moduleName = tolower(a:word)
   exe "norm! ccconst " .a:word. " = require('" .a:moduleName. "');"
 endfunction
 
-nnoremap <leader>i :<C-U>call <SID>importModal()<CR>
-nnoremap <leader>r :<C-U>call <SID>requireModal()<CR>
+function s:consoleLine()
+  let a:word = expand('<cword>')
+  exec "norm! ccconsole.log(" .a:word. ");"
+endfunction
+
+nnoremap <leader>i :<C-U>call <SID>importModalLine()<CR>
+nnoremap <leader>r :<C-U>call <SID>requireModalLine()<CR>
+nnoremap <leader>c :<C-U>call <SID>consoleLine()<CR>
 
 
 "Vimux
